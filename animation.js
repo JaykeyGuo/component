@@ -84,7 +84,7 @@ export class TimeLine {
     this.state = 'playing';
     this.startTime = Date.now();
     this.pauseTime = null;
-    this.tick();
+    this.state = 'inited'
   }
 
   restart() {
