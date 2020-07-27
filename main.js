@@ -26,6 +26,7 @@ class Carousel {
     let position = 0;
 
     let timeline = new TimeLine();
+    window.xtimeLine = timeline;
     timeline.start();
 
     let nextPic = () => {
@@ -51,7 +52,7 @@ class Carousel {
       timeline.add(nextAnimation);
 
       position = nextPostion;
-      setTimeout(nextPic, 3000);
+      window.stopHandler = setTimeout(nextPic, 3000);
 
       // current.style.transition = 'ease 0s';
       // next.style.transition = 'ease 0s';

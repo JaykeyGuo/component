@@ -1,42 +1,48 @@
 export class TimeLine {
   constructor() {
-    this.animations = [];
-    this.pauseTime = null;
+    this.animations = new Set;
+    this.finishedAnimations = new Set; // TODO:
+    this.addTime = new Map;
+    // this.pauseTime = null;
     this.rafId = null;
     this.state = 'inited'
     // TODO: Tthis.acitveAnimation
-    this.startTime = null;
+    // this.startTime = null;
+    this.tick = () => {
+      // let animations = this.animations.filter(animation => !animation.finished);
+      let t = Date.now() - this.startTime; // FIXME: 放在方法中的时候存在 this 丢失的问题
+
+      for (let animation of this.animations) {
+        let { object, property, template, start, end, duration, delay, timingFunction } = animation;
+
+        let startTime = this.addTime.get(animation);
+
+        if (t < delay + startTime) {
+          continue;
+        }
+
+        let progression = timingFunction((t - delay - startTime) / duration);
+
+        if (t > duration + delay + startTime) {
+          progression = 1;
+          // animation.finished = true;
+          this.animations.delete(animation);
+        }
+
+        let value = animation.valueFromPreogression(progression);
+
+        object[property] = template(value);
+
+        // object[property] = template(timingFunction(start, end)(t - delay));
+      }
+      if (this.animations.size) {
+        this.rafId = requestAnimationFrame(() => this.tick())
+      } else {
+        this.rafId = null;
+      }
+    }
   }
 
-  tick() {
-    let animations = this.animations.filter(animation => !animation.finished);
-    let t = Date.now() - this.startTime;
-
-    for (let animation of animations) {
-      let { object, property, template, start, end, duration, delay, timingFunction, startTime } = animation;
-
-      if (t < delay + startTime) {
-        continue;
-      }
-
-      let progression = timingFunction((t - delay - startTime) / duration);
-
-      if (t > duration + delay + startTime) {
-        progression = 1;
-        animation.finished = true;
-      }
-
-
-      let value = animation.valueFromPreogression(progression);
-
-      object[property] = template(value);
-
-      // object[property] = template(timingFunction(start, end)(t - delay));
-    }
-    if (true || animations.length) {
-      this.rafId = requestAnimationFrame(() => this.tick())
-    }
-  }
 
   start() {
     if (this.state !== 'inited') {
@@ -55,6 +61,7 @@ export class TimeLine {
     this.pauseTime = Date.now();
     if (this.rafId !== null) {
       cancelAnimationFrame(this.rafId);
+      this.rafId = null;
     }
   }
 
@@ -67,10 +74,27 @@ export class TimeLine {
     this.tick();
   }
 
+  reset() {
+    if (this.state === 'playing') {
+      this.pause();
+    }
+    this.animations = new Set;
+    this.addTime = new Map;
+    this.rafId = null;
+    this.state = 'playing';
+    this.startTime = Date.now();
+    this.pauseTime = null;
+    this.tick();
+  }
+
   restart() {
     if (this.state === 'playing') {
       this.pause();
     }
+    for (let anmation of this.finishedAnimations) {
+      this.animations.add(anmation);
+    }
+    this.finishedAnimations = new Set;
     this.rafId = null;
     this.state = 'playing';
     this.startTime = Date.now();
@@ -79,12 +103,16 @@ export class TimeLine {
   }
 
   add(animation, startTime) {
-    this.animations.push(animation);
-    animation.finished = false;
+    this.animations.add(animation);
+    this.finishedAnimations.add(animation);
+    // animation.finished = false;
+    if (this.state === 'playing' && this.rafId === null) {
+      this.tick();
+    }
     if (this.state === 'playing') {
-      animation.startTime = startTime !== void 0 ? startTime : Date.now() - this.startTime;
+      this.addTime.set(animation, startTime !== void 0 ? startTime : Date.now() - this.startTime);
     } else {
-      animation.startTime = startTime !== void 0 ? startTime : 0;
+      this.addTime.set(animation, startTime !== void 0 ? startTime : 0);
     }
   }
 }

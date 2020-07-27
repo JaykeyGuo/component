@@ -1,6 +1,6 @@
 export function create(Cls, attirbutes, ...children) {
-  console.log(Cls, '---------')
-  console.log(attirbutes, '---------')
+  // console.log(Cls, '---------')
+  // console.log(attirbutes, '---------')
   let o;
 
   if (typeof Cls === 'string') {
@@ -26,8 +26,8 @@ export function create(Cls, attirbutes, ...children) {
   // // console.log(children);
 
   let visit = (children) => {
-    console.log('----=-=-=-=-=-=');
-    console.log(children);
+    // console.log('----=-=-=-=-=-=');
+    // console.log(children);
     for (const child of children) {
       if (typeof child === 'object' && child instanceof Array) {
         visit(child);
