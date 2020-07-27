@@ -83,4 +83,4 @@ export function cubicBezier(p1x, p1y, p2x, p2y) {
 
 
 export const ease = cubicBezier(.25,.1,.25,1);
-export const line = cubicBezier(0,.0,1,1);
+export const line = cubicBezier(0,0,1,1);
