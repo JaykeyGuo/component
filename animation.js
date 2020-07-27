@@ -81,7 +81,6 @@ export class TimeLine {
     this.animations = new Set;
     this.addTime = new Map;
     this.rafId = null;
-    this.state = 'playing';
     this.startTime = Date.now();
     this.pauseTime = null;
     this.state = 'inited'
