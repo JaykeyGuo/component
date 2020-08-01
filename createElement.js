@@ -1,6 +1,6 @@
+import { enableGesture } from './gusture';
+
 export function create(Cls, attirbutes, ...children) {
-  // console.log(Cls, '---------')
-  // console.log(attirbutes, '---------')
   let o;
 
   if (typeof Cls === 'string') {
@@ -15,19 +15,7 @@ export function create(Cls, attirbutes, ...children) {
     o.setAttribute(name, attirbutes[name]);
   }
 
-  // for (let child of children) {
-  //   if (typeof child === 'string') {
-  //     child = new Text(child);
-  //   }
-  //   o.appendChild(child);
-  //   // o.children.push(child);
-  // }
-
-  // // console.log(children);
-
   let visit = (children) => {
-    // console.log('----=-=-=-=-=-=');
-    // console.log(children);
     for (const child of children) {
       if (typeof child === 'object' && child instanceof Array) {
         visit(child);
@@ -49,9 +37,14 @@ export function create(Cls, attirbutes, ...children) {
 
 export class Text {
   constructor(text) {
-    // console.log(config);
     this.children = [];
     this.root = document.createTextNode(text);
+  }
+  getAttribute(name) {
+    return;
+  }
+  appendChild(child) {
+    this.children.push(child);
   }
   mountTo(parent) {
     parent.appendChild(this.root);
@@ -60,20 +53,27 @@ export class Text {
 
 export class Wrapper {
   constructor(type) {
-    // console.log(config);
     this.children = [];
     this.root = document.createElement(type);
   }
-  // set id(val) {
-  //   console.log("Parent::class", val);
-  // }
   setAttribute(name, value) {
-    // console.log(name, value);
     this.root.setAttribute(name, value);
+
+    if (name.match(/^on([\s\S]+)$/)) {
+      let eventName = RegExp.$1.replace(/^[\s\S]/, c => c.toLocaleLowerCase());
+      this.addEventListener(eventName, value);
+    }
+
+    if (name === 'enableGesture') {
+      enableGesture(this.root);
+    }
+  }
+
+  getAttribute(name) {
+    return this.root.getAttribute(name);
   }
 
   appendChild(child) {
-    // console.log("Parent::appendChild", child);
     this.children.push(child);
   }
 
@@ -83,6 +83,14 @@ export class Wrapper {
 
   get style() {
     return this.root.style;
+  }
+
+  get classList() {
+    return this.root.classList;
+  }
+
+  set innerText(text) {
+    return this.root.innerText = text;
   }
 
   mountTo(parent) {
