@@ -2,7 +2,13 @@ import { create, Text, Wrapper } from './createElement.js';
 
 import { TimeLine, Animation } from './animation';
 import { ease } from './cubicBezier';
-const liner = (t) => t;
+
+import css from './carousel.css';
+
+// console.log(css);
+// let style = document.createElement('style');
+// style.innerHTML = css[0][1];
+// document.documentElement.appendChild(style);
 
 export class Carousel {
   constructor(config) {
