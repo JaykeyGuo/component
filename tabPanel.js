@@ -21,10 +21,7 @@ export class TabPanel {
   }
 
   getAttribute(name) {
-    console.log(this);
-    console.log(name);
-    return name;
-    // retrun this[name];
+    return this[name];
   }
 
   mountTo(parent) {
